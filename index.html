@@ -2,53 +2,39 @@
 <html>
 <head>
     <title>Stored XSS Demo</title>
-    <style>
-        body { font-family: sans-serif; background: #f0f0f0; padding: 20px; }
-        textarea, button { width: 300px; margin-top: 10px; padding: 8px; }
-        #comments { margin-top: 20px; }
-    </style>
 </head>
 <body>
     <h2>Guestbook</h2>
     <form onsubmit="saveComment(event)">
-        <textarea id="commentInput" placeholder="Enter your comment"></textarea><br>
-        <button type="submit">Post Comment</button>
+        <textarea id="comment" placeholder="Write your comment..."></textarea><br>
+        <button type="submit">Post</button>
     </form>
 
     <div id="comments"></div>
 
     <script>
-        const commentsDiv = document.getElementById("comments");
-
-        function loadComments() {
-            const stored = JSON.parse(localStorage.getItem("comments") || "[]");
-            commentsDiv.innerHTML = "";
-            stored.forEach(c => {
-                const p = document.createElement("p");
-                p.innerHTML = c; // VULNERABLE to XSS
-                commentsDiv.appendChild(p);
-            });
-        }
-
         function saveComment(e) {
             e.preventDefault();
-            const input = document.getElementById("commentInput").value;
-            const stored = JSON.parse(localStorage.getItem("comments") || "[]");
-            stored.push(input);
-            localStorage.setItem("comments", JSON.stringify(stored));
-            loadComments();
-            document.getElementById("commentInput").value = "";
+            const c = document.getElementById("comment").value;
+            const comments = JSON.parse(localStorage.getItem("xss_comments") || "[]");
+            comments.push(c);
+            localStorage.setItem("xss_comments", JSON.stringify(comments));
+            location.reload();
         }
 
-        // Trigger flag only if alert was shown before
-        window.addEventListener("load", () => {
-            setTimeout(() => {
-                if (window.alertWasTriggered) {
-                    const flag = "THM{Stored_XSS_Flag}";
-                    alert("Flag: " + flag);
-                }
-            }, 1000);
+        const stored = JSON.parse(localStorage.getItem("xss_comments") || "[]");
+        const container = document.getElementById("comments");
+
+        stored.forEach(comment => {
+            const div = document.createElement("div");
+            div.innerHTML = comment; // vulnerable to XSS
+            container.appendChild(div);
         });
+
+        // Inject flag when XSS triggers custom function
+        function showFlag() {
+            alert("THM{Stored_XSS_Flag}");
+        }
     </script>
 </body>
 </html>
