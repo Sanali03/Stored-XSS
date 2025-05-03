@@ -5,6 +5,7 @@
 </head>
 <body>
     <h2>Guestbook</h2>
+
     <form onsubmit="saveComment(event)">
         <textarea id="comment" placeholder="Write your comment..."></textarea><br>
         <button type="submit">Post</button>
@@ -12,14 +13,12 @@
 
     <div id="comments"></div>
 
-    <!-- ✅ Define the flag function FIRST -->
     <script>
-        function showFlag() {
+        // Define the function BEFORE anything else
+        window.showFlag = function () {
             alert("THM{Stored_XSS_Flag}");
-        }
-    </script>
+        };
 
-    <script>
         function saveComment(e) {
             e.preventDefault();
             const c = document.getElementById("comment").value;
@@ -34,7 +33,7 @@
 
         stored.forEach(comment => {
             const div = document.createElement("div");
-            div.innerHTML = comment; // Vulnerable to XSS
+            div.innerHTML = comment; // vulnerable to XSS
             container.appendChild(div);
         });
     </script>
