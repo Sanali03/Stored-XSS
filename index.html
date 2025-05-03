@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <title>Stored XSS Demo</title>
     <script>
-        // ✅ Must be defined FIRST so injected scripts can access it
-        window.showFlag = function () {
+        // ✅ Must be globally defined before any script injection
+        function showFlag() {
             alert("THM{Stored_XSS_Flag}");
-        };
+        }
     </script>
 </head>
 <body>
@@ -30,13 +30,13 @@
             location.reload();
         }
 
-        const stored = JSON.parse(localStorage.getItem("comments") || "[]");
-        const container = document.getElementById("comments");
+        const storedComments = JSON.parse(localStorage.getItem("comments") || "[]");
+        const commentContainer = document.getElementById("comments");
 
-        stored.forEach(c => {
-            const div = document.createElement("div");
-            div.innerHTML = c; // 🔥 XSS injection point
-            container.appendChild(div);
+        storedComments.forEach(c => {
+            const wrapper = document.createElement("div");
+            wrapper.innerHTML = c; // ⚠️ XSS injection point
+            commentContainer.appendChild(wrapper);
         });
     </script>
 </body>
