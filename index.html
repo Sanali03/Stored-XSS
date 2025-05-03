@@ -1,43 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Stored XSS Demo</title>
-    <script>
-        // ✅ Must be globally defined before any script injection
-        function showFlag() {
-            alert("THM{Stored_XSS_Flag}");
-        }
-    </script>
+  <meta charset="UTF-8">
+  <title>Stored XSS - Malicious Memory</title>
 </head>
 <body>
-    <h2>Guestbook</h2>
+  <h1>Blog Post</h1>
+  <p>This is a comment section where you can leave feedback.</p>
 
-    <form onsubmit="saveComment(event)">
-        <textarea id="comment" placeholder="Write your comment..."></textarea><br>
-        <button type="submit">Post</button>
-    </form>
+  <h2>Leave a Comment:</h2>
+  <form id="commentForm">
+    <textarea id="comment" rows="4" cols="50" placeholder="Leave your comment"></textarea><br>
+    <button type="submit">Submit Comment</button>
+  </form>
 
-    <div id="comments"></div>
+  <div id="commentsSection">
+    <h3>Comments</h3>
+  </div>
 
-    <script>
-        function saveComment(e) {
-            e.preventDefault();
-            const comment = document.getElementById("comment").value;
-            const comments = JSON.parse(localStorage.getItem("comments") || "[]");
-            comments.push(comment);
-            localStorage.setItem("comments", JSON.stringify(comments));
-            location.reload();
-        }
+  <script>
+    // Set a fake "Admin" cookie
+    document.cookie = "AdminSession=abc123";
 
-        const storedComments = JSON.parse(localStorage.getItem("comments") || "[]");
-        const commentContainer = document.getElementById("comments");
+    // Handle comment submission
+    document.getElementById("commentForm").onsubmit = function(e) {
+      e.preventDefault();
+      const comment = document.getElementById("comment").value;
+      localStorage.setItem("comment", comment);
+      location.reload();
+    };
 
-        storedComments.forEach(c => {
-            const wrapper = document.createElement("div");
-            wrapper.innerHTML = c; // ⚠️ XSS injection point
-            commentContainer.appendChild(wrapper);
-        });
-    </script>
+    // Get stored comment
+    const storedComment = localStorage.getItem("comment");
+    if (storedComment) {
+      // Inject comment into page — vulnerable to XSS
+      document.getElementById("commentsSection").innerHTML += `<p>${storedComment}</p>`;
+
+      // Simulate XSS attack when <script> is present
+      if (storedComment.includes("<script>")) {
+        // Simulate stolen session
+        const stolenCookie = document.cookie;
+        window.location.href = window.location.pathname + "?cookie=" + encodeURIComponent(stolenCookie);
+      }
+    }
+
+    // Check for stolen cookie and reveal flag
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("cookie") === "AdminSession=abc123") {
+      alert("Flag: THM{stored_xss_steals_sessions}");
+    }
+  </script>
 </body>
 </html>
