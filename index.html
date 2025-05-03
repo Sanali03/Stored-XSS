@@ -14,26 +14,25 @@
     <div id="comments"></div>
 
     <script>
-        // Define the function BEFORE anything else
-        window.showFlag = function () {
+        function showFlag() {
             alert("THM{Stored_XSS_Flag}");
-        };
+        }
 
         function saveComment(e) {
             e.preventDefault();
-            const c = document.getElementById("comment").value;
-            const comments = JSON.parse(localStorage.getItem("xss_comments") || "[]");
-            comments.push(c);
-            localStorage.setItem("xss_comments", JSON.stringify(comments));
+            const comment = document.getElementById("comment").value;
+            const comments = JSON.parse(localStorage.getItem("comments") || "[]");
+            comments.push(comment);
+            localStorage.setItem("comments", JSON.stringify(comments));
             location.reload();
         }
 
-        const stored = JSON.parse(localStorage.getItem("xss_comments") || "[]");
+        const stored = JSON.parse(localStorage.getItem("comments") || "[]");
         const container = document.getElementById("comments");
 
-        stored.forEach(comment => {
+        stored.forEach(c => {
             const div = document.createElement("div");
-            div.innerHTML = comment; // vulnerable to XSS
+            div.innerHTML = c;
             container.appendChild(div);
         });
     </script>
