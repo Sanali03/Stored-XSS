@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Stored XSS Challenge</title>
+    <meta charset="UTF-8">
+    <title>Stored XSS Demo</title>
 </head>
 <body>
     <h2>Guestbook</h2>
@@ -13,31 +14,28 @@
 
     <div id="comments"></div>
 
-    <!-- Define globally accessible function -->
     <script>
+        // Define flag function BEFORE any comment runs
         window.showFlag = function () {
             alert("THM{Stored_XSS_Flag}");
         };
-    </script>
 
-    <!-- Render stored comments and allow execution -->
-    <script>
         function saveComment(e) {
             e.preventDefault();
-            const input = document.getElementById("comment").value;
+            const comment = document.getElementById("comment").value;
             const comments = JSON.parse(localStorage.getItem("comments") || "[]");
-            comments.push(input);
+            comments.push(comment);
             localStorage.setItem("comments", JSON.stringify(comments));
             location.reload();
         }
 
-        const comments = JSON.parse(localStorage.getItem("comments") || "[]");
+        const stored = JSON.parse(localStorage.getItem("comments") || "[]");
         const container = document.getElementById("comments");
 
-        comments.forEach(c => {
-            const wrapper = document.createElement("div");
-            wrapper.innerHTML = c;
-            container.appendChild(wrapper);
+        stored.forEach(c => {
+            const div = document.createElement("div");
+            div.innerHTML = c; // Vulnerable to XSS
+            container.appendChild(div);
         });
     </script>
 </body>
