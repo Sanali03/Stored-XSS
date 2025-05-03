@@ -12,6 +12,13 @@
 
     <div id="comments"></div>
 
+    <!-- ✅ Define the flag function FIRST -->
+    <script>
+        function showFlag() {
+            alert("THM{Stored_XSS_Flag}");
+        }
+    </script>
+
     <script>
         function saveComment(e) {
             e.preventDefault();
@@ -27,14 +34,9 @@
 
         stored.forEach(comment => {
             const div = document.createElement("div");
-            div.innerHTML = comment; // vulnerable to XSS
+            div.innerHTML = comment; // Vulnerable to XSS
             container.appendChild(div);
         });
-
-        // Inject flag when XSS triggers custom function
-        function showFlag() {
-            alert("THM{Stored_XSS_Flag}");
-        }
     </script>
 </body>
 </html>
